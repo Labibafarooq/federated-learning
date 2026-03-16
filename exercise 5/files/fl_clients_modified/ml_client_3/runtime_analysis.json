@@ -1,0 +1,12 @@
+{
+    "client_id": 3,
+    "round_no": 30,
+    "training_time (secs)": "0:00:0.340361",
+    "incremental_MSE_Min": 0.0003329129,
+    "incremental_MSE_Median": 0.0193828374,
+    "incremental_MSE_Max": 0.4354043554,
+    "average_MSE": 0.002491535,
+    "round_threshold": 0.0040630118,
+    "threshold": 0.1351248265,
+    "model_round_trip": 0.3113452005
+}

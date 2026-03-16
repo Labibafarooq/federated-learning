@@ -1,0 +1,261 @@
+networks:
+  dps_network:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 10.60.0.0/16
+  ml_comm_network:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 10.50.0.0/16
+services:
+  broker_in:
+    command:
+    - bash
+    - /app/confs/run_broker.sh
+    - main
+    - i
+    container_name: broker_in
+    env_file:
+    - .env
+    image: registrylab.roc.cnam.fr/goyban/fladdps/ndbf:2.13-3.9.0
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.10
+    tty: true
+    volumes:
+    - ./NDBF/config:/app/confs
+  broker_out:
+    command:
+    - bash
+    - /app/confs/run_broker.sh
+    - main
+    - e
+    container_name: broker_out
+    env_file:
+    - .env
+    image: registrylab.roc.cnam.fr/goyban/fladdps/ndbf:2.13-3.9.0
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.11
+    tty: true
+    volumes:
+    - ./NDBF/config:/app/confs
+  data_gen_1:
+    build:
+      context: .
+      dockerfile: ./DATASOURCE/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_datasource.sh
+    - '1'
+    container_name: data_gen_1
+    depends_on:
+    - ml_client_1
+    env_file:
+    - .env
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.31
+    tty: true
+    volumes:
+    - ./DATASOURCE/config:/app/confs
+  data_gen_2:
+    build:
+      context: .
+      dockerfile: ./DATASOURCE/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_datasource.sh
+    - '2'
+    container_name: data_gen_2
+    depends_on:
+    - ml_client_2
+    env_file:
+    - .env
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.32
+    tty: true
+    volumes:
+    - ./DATASOURCE/config:/app/confs
+  data_gen_3:
+    build:
+      context: .
+      dockerfile: ./DATASOURCE/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_datasource.sh
+    - '3'
+    container_name: data_gen_3
+    depends_on:
+    - ml_client_3
+    env_file:
+    - .env
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.33
+    tty: true
+    volumes:
+    - ./DATASOURCE/config:/app/confs
+  data_gen_4:
+    build:
+      context: .
+      dockerfile: ./DATASOURCE/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_datasource.sh
+    - '4'
+    container_name: data_gen_4
+    depends_on:
+    - ml_client_1
+    env_file:
+    - .env
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.34
+    tty: true
+    volumes:
+    - ./DATASOURCE/config:/app/confs
+  data_gen_5:
+    build:
+      context: .
+      dockerfile: ./DATASOURCE/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_datasource.sh
+    - '5'
+    container_name: data_gen_5
+    depends_on:
+    - ml_client_2
+    env_file:
+    - .env
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.35
+    tty: true
+    volumes:
+    - ./DATASOURCE/config:/app/confs
+  data_gen_6:
+    build:
+      context: .
+      dockerfile: ./DATASOURCE/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_datasource.sh
+    - '6'
+    container_name: data_gen_6
+    depends_on:
+    - ml_client_3
+    env_file:
+    - .env
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.36
+    tty: true
+    volumes:
+    - ./DATASOURCE/config:/app/confs
+  dps_main:
+    build:
+      context: .
+      dockerfile: ./NDPPF/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_ndppf.sh
+    - main
+    container_name: dps_main
+    depends_on:
+    - broker_in
+    - broker_out
+    env_file:
+    - .env
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.12
+    tty: true
+    volumes:
+    - ./NDPPF/config:/app/confs
+  ml_client_1:
+    build:
+      context: .
+      dockerfile: ./FLInstant/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_client.sh
+    - '1'
+    container_name: ml_client_1
+    depends_on:
+    - ml_server
+    - dps_main
+    env_file:
+    - .env
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.21
+      ml_comm_network:
+        ipv4_address: 10.50.0.2
+    tty: true
+    volumes:
+    - ./FLInstant/config:/app/confs
+  ml_client_2:
+    build:
+      context: .
+      dockerfile: ./FLInstant/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_client.sh
+    - '2'
+    container_name: ml_client_2
+    depends_on:
+    - ml_server
+    - dps_main
+    env_file:
+    - .env
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.22
+      ml_comm_network:
+        ipv4_address: 10.50.0.3
+    tty: true
+    volumes:
+    - ./FLInstant/config:/app/confs
+  ml_client_3:
+    build:
+      context: .
+      dockerfile: ./FLInstant/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_client.sh
+    - '3'
+    container_name: ml_client_3
+    depends_on:
+    - ml_server
+    - dps_main
+    env_file:
+    - .env
+    networks:
+      dps_network:
+        ipv4_address: 10.60.0.23
+      ml_comm_network:
+        ipv4_address: 10.50.0.4
+    tty: true
+    volumes:
+    - ./FLInstant/config:/app/confs
+  ml_server:
+    build:
+      context: .
+      dockerfile: ./FLInstant/Dockerfile
+    command:
+    - bash
+    - /app/confs/run_server.sh
+    container_name: ml_server
+    env_file:
+    - .env
+    networks:
+      ml_comm_network:
+        ipv4_address: 10.50.0.1
+    tty: true
+    volumes:
+    - ./FLInstant/config:/app/confs
+version: '3.8'
